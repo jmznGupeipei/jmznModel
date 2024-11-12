@@ -1,0 +1,40 @@
+{
+"templateName","13testmodel",  
+"stpeChildList":[{"type":"plugin",
+"pluginType":"script",
+"artifactsType":"cloud",
+"minIOKey":"model",
+"curNode":"1",
+"ctInPath":"/workspace/input_dir",
+"ctOutPath":"/workspace/input_dir",
+"inputDataToNode":"2",
+"inputDataFromNode":"",
+"scriptImage":"python:3.8",
+"scriptCommand":["python"],
+"scriptSource":"import os\nimport json\nimport csv\nclass VolumeUtils:\n    def save_project_data_file(self, sec_num, route, file_name):\n        try:\n            if not route.endswith(\"\\\\\") and not route.endswith(\"/\"):\n                route += \"\\\\\"\n            lines = self.read_file(route, file_name)\n            with open(os.path.join(route, file_name), 'w', encoding='gbk') as writer:\n                line_arr = lines.split(\",\")\n                for i, line in enumerate(line_arr):\n                    if i == 3:\n                        writer.write(f\"{sec_num}\\n\")\n                    elif i == 5:\n                        pool_num = sec_num\n                        writer.write(f\"{pool_num - 1}\\n\")\n                    else:\n                        writer.write(f\"{line}\\n\")\n        except Exception as e:\n            print(f\"Error: {e}\")\n    def save_relation_file(self, relationData, route, file_name):\n        \"\"\"\n        保存RELATION.txt文件\n        :param relation: 闸门序号 控制断面序号 json数据\n        :param route: 文件地址\n        :param file_name: 文件名称\n        \"\"\"\n        try:\n            if not route.endswith(os.path.sep):\n                route += os.path.sep\n            file_path = os.path.join(route, file_name)\n            title = \"闸门序号 控制断面序号\\n\"\n            with open(file_path, 'w', encoding='utf-8') as file:\n                file.write(title)\n                for dataitem in relationData:\n                    line = f\"{dataitem['gateCode']}\\t{dataitem['sectionCode']}\\n\"\n                    file.write(line)\n        except Exception as e:\n            print(f\"Error: {e}\")\n    def read_file(self, route, file_name):\n        try:\n            if not route.endswith(\"\\\\\") and not route.endswith(\"/\"):\n                route += \"\\\\\"\n            with open(os.path.join(route, file_name), 'r', encoding='gbk') as reader:\n                lines = reader.read().replace('\\n', ',')\n                return lines\n        except Exception as e:\n            print(f\"Error: {e}\")\n            return \"\"\n    def save_realtime_file(self, data_list, route, file_name):\n        \"\"\"\n        保存 REALTIME_DATA.txt 文件\n        param realtime_data: data list\n        :param route: 文件地址\n        :param file_name: 文件名称\n        \"\"\"\n        try:\n            if not route.endswith(os.sep):\n                route += os.sep\n            file_path = os.path.join(route, file_name)\n            with open(file_path, mode='w', newline='', encoding='utf-8') as file:\n                writer = csv.writer(file, delimiter='\\t')\n                writer.writerow([\"序号\", \"闸上实测水位\", \"闸下实测水位\", \"名称\"])\n                for dataitem in data_list:\n                    writer.writerow([dataitem[\"gateCode\"], dataitem[\"beforeWater\"], dataitem[\"behindWater\"], dataitem[\"gateName\"]])\n        except Exception as e:\n            print(f\"Error: {e}\")\n\nif __name__ == \"__main__\":\n\n    data = {{inputs.parameters.input-json-node1-1}}   # inputs里面定义的参数可以直接使用\n    data1 = {{inputs.parameters.input-json-node1-2}} \n    volume_utils = VolumeUtils()\n    volume_utils.save_project_data_file(data[\"sec_num\"], \"/workspace/input_dir/INPUTFILE/\", \"PROJECT_DATA.txt\")\n    volume_utils.save_relation_file(data1[\"relationData\"], \"/workspace/input_dir/INPUTFILE/\", \"RELATION.txt\")\n    volume_utils.save_realtime_file(data1[\"realTimeData\"], \"/workspace/input_dir/INPUTFILE/\", \"REALTIME_DATA.txt\")\n",
+"containerArgs":[],
+"stepChildParamsList":[
+	{
+		"paramId":"1",
+		"paramName":"input-json-node1-1",
+		"paramValue":"{\n  \"id\": \"1\",\n  \"model\": \"Volume\",\n  \"type\": \"input\",\n  \"sec_num\": 4,\n  \"relationData\": [\n    {\n      \"gateCode\": 1,\n      \"sectionCode\": \"1\"\n    },\n    {\n      \"gateCode\": 2,\n      \"sectionCode\": \"13\"\n    },\n    {\n      \"gateCode\": 3,\n      \"sectionCode\": \"23\"\n    },\n    {\n      \"gateCode\": 4,\n      \"sectionCode\": \"37\"\n    }\n  ],\n  \"realTimeData\": [\n    {\n      \"gateCode\": 1,\n      \"beforeWater\": 1.1,\n      \"behindWater\": 0.8,\n      \"gateName\": \"闸1\"\n    },\n    {\n      \"gateCode\": 2,\n      \"beforeWater\": 2.1,\n      \"behindWater\": 1.8,\n      \"gateName\": \"闸2\"\n    },\n    {\n      \"gateCode\": 3,\n      \"beforeWater\": 3.1,\n      \"behindWater\": 2.8,\n      \"gateName\": \"闸3\"\n    },\n    {\n      \"gateCode\": 4,\n      \"beforeWater\": 4.1,\n      \"behindWater\": 3.8,\n      \"gateName\": \"闸4\"\n    }\n  ]\n}\n",
+		"paramType":"json",
+		"wfNodeId":"node1"
+	},
+	{
+		"paramId":"2",
+		"paramName":"input-json-node1-2",
+		"paramValue":"{\n  \"id\": \"1\",\n  \"model\": \"Volume\",\n  \"type\": \"input\",\n  \"sec_num\": 4,\n  \"relationData\": [\n    {\n      \"gateCode\": 1,\n      \"sectionCode\": \"1\"\n    },\n    {\n      \"gateCode\": 2,\n      \"sectionCode\": \"13\"\n    },\n    {\n      \"gateCode\": 3,\n      \"sectionCode\": \"23\"\n    },\n    {\n      \"gateCode\": 4,\n      \"sectionCode\": \"37\"\n    }\n  ],\n  \"realTimeData\": [\n    {\n      \"gateCode\": 1,\n      \"beforeWater\": 1.1,\n      \"behindWater\": 0.8,\n      \"gateName\": \"闸1\"\n    },\n    {\n      \"gateCode\": 2,\n      \"beforeWater\": 2.1,\n      \"behindWater\": 1.8,\n      \"gateName\": \"闸2\"\n    },\n    {\n      \"gateCode\": 3,\n      \"beforeWater\": 3.1,\n      \"behindWater\": 2.8,\n      \"gateName\": \"闸3\"\n    },\n    {\n      \"gateCode\": 4,\n      \"beforeWater\": 4.1,\n      \"behindWater\": 3.8,\n      \"gateName\": \"闸4\"\n    }\n  ]\n}\n",
+		"paramType":"json",
+		"wfNodeId":"node1"
+	},
+	{
+		"paramId":"3",
+		"paramName":"input-json-node1-3",
+		"paramValue":"{\n  \"id\": \"1\",\n  \"model\": \"Volume\",\n  \"type\": \"input\",\n  \"sec_num\": 4,\n  \"relationData\": [\n    {\n      \"gateCode\": 1,\n      \"sectionCode\": \"1\"\n    },\n    {\n      \"gateCode\": 2,\n      \"sectionCode\": \"13\"\n    },\n    {\n      \"gateCode\": 3,\n      \"sectionCode\": \"23\"\n    },\n    {\n      \"gateCode\": 4,\n      \"sectionCode\": \"37\"\n    }\n  ],\n  \"realTimeData\": [\n    {\n      \"gateCode\": 1,\n      \"beforeWater\": 1.1,\n      \"behindWater\": 0.8,\n      \"gateName\": \"闸1\"\n    },\n    {\n      \"gateCode\": 2,\n      \"beforeWater\": 2.1,\n      \"behindWater\": 1.8,\n      \"gateName\": \"闸2\"\n    },\n    {\n      \"gateCode\": 3,\n      \"beforeWater\": 3.1,\n      \"behindWater\": 2.8,\n      \"gateName\": \"闸3\"\n    },\n    {\n      \"gateCode\": 4,\n      \"beforeWater\": 4.1,\n      \"behindWater\": 3.8,\n      \"gateName\": \"闸4\"\n    }\n  ]\n}\n",
+		"paramType":"json",
+		"wfNodeId":"node1"
+	}
+]
+}]
+}
